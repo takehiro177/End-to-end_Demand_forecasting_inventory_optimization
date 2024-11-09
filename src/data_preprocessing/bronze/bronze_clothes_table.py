@@ -8,14 +8,14 @@ spark.conf.set("fs.azure.account.key.takehiropersonal.dfs.core.windows.net", sto
 query = (spark.readStream.format("cloudFiles")
                          .option("cloudFiles.format", "binaryFile")
                          .option("pathGlobfilter", "*.png")
-                         .option("cloudFiles.schemaLocation", "dbfs:/twinllm/checkpoint/bronze/clothes_retail_image")
+                         .option("cloudFiles.schemaLocation", "dbfs:/end_to_end_demand_forecast/checkpoint/bronze/clothes_retail_image")
                          .load("abfss://clothes-retail-image-datasource@takehiropersonal.dfs.core.windows.net/*/*/")
                         .writeStream
                          .format("delta")
                          .outputMode("append")
-                         .option("checkpointLocation", "dbfs:/twinllm/checkpoint/bronze/clothes_retail_image")
+                         .option("checkpointLocation", "dbfs:/end_to_end_demand_forecast/checkpoint/bronze/clothes_retail_image")
                          .trigger(availableNow=True)
-                         .table("portfolio.twinllm.bronze_clothes_table")
+                         .table("portfolio.end_to_end_demand_forecast.bronze_clothes_table")
 )
 
 query.awaitTermination()
@@ -23,13 +23,14 @@ query.awaitTermination()
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC SELECT * FROM portfolio.twinllm.bronze_clothes_table
+# MAGIC SELECT * FROM portfolio.end_to_end_demand_forecast.bronze_clothes_table
+# MAGIC LIMIT 7;
 
 # COMMAND ----------
 
 #%sql
-#DROP TABLE portfolio.twinllm.bronze_clothes_table
+##DROP TABLE portfolio.end_to_end_demand_forecast.bronze_clothes_table
 
 # COMMAND ----------
 
-#dbutils.fs.rm("dbfs:/twinllm/checkpoint/bronze/clothes_retail_image", True)
+#dbutils.fs.rm("dbfs:/end_to_end_demand_forecast/checkpoint/bronze/clothes_retail_image", True)
