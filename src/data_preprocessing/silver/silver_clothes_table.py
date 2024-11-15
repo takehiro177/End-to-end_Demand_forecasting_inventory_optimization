@@ -6,7 +6,7 @@ spark.conf.set("fs.azure.account.key.takehiropersonal.dfs.core.windows.net", sto
 # COMMAND ----------
 
 # Install Library
-%pip install fastembed
+%pip install fastembed-gpu
 
 # COMMAND ----------
 
@@ -24,7 +24,7 @@ import io
 import numpy as np
 import pandas as pd
 from pyspark.sql.functions import pandas_udf
-from PIL import Image
+from PIL import Image, ImageOps
 
 from fastembed import ImageEmbedding
 
@@ -48,7 +48,8 @@ def extract_size_udf(content_series):
 def extract_img_embed(content):
   """Extract image embedding from its raw content."""
   image = Image.open(io.BytesIO(content))
-  model = ImageEmbedding(model_name="Qdrant/clip-ViT-B-32-vision")
+  image = ImageOps.fit(image, (128, 128), Image.LANCZOS)
+  model = ImageEmbedding(model_name="Qdrant/clip-ViT-B-32-vision", cuda=True)
   embed = model.embed(image)
 
   return embed
@@ -80,7 +81,7 @@ def batch_upsert(microBatchDF, batchId):
 
 # COMMAND ----------
 
-query = (spark.readStream.table("portfolio.end_to_end_demand_forecast.bronze_clothes_table")
+query = (spark.readStream.option("maxBytesPerTrigger", "1g").table("portfolio.end_to_end_demand_forecast.bronze_clothes_table")
                         .writeStream
                          .foreachBatch(batch_upsert)
                          .option("checkpointLocation", "dbfs:/end_to_end_demand_forecast/checkpoint/silver/clothes_retail_image")
@@ -98,9 +99,9 @@ query.awaitTermination()
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC DROP TABLE portfolio.end_to_end_demand_forecast.silver_clothes_table
+#%sql
+##DROP TABLE portfolio.end_to_end_demand_forecast.silver_clothes_table
 
 # COMMAND ----------
 
-dbutils.fs.rm("dbfs:/end_to_end_demand_forecast/checkpoint/silver/clothes_retail_image", True)
+##dbutils.fs.rm("dbfs:/end_to_end_demand_forecast/checkpoint/silver/clothes_retail_image", True)
