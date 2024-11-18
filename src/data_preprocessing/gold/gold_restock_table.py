@@ -13,6 +13,19 @@ preprocessed_restock = (spark.read.table("portfolio.end_to_end_demand_forecast.s
                          .withColumn("date", F.expr("to_date(year_week_str, 'yyyywwu')"))
                          .drop("year_week_str")
                 )
+        
+initial_restock = (spark.read.table("portfolio.end_to_end_demand_forecast.silver_sales_table")
+                         .select(F.col("external_code"),
+                                 F.col("retail"),
+                                 F.col("current_week_of_year").alias("week"),
+                                 F.col("current_date_of_week").alias("date"),
+                                 F.col("restock").alias("qty"))
+                         .withColumn("year", F.year(F.col("date")))
+                         .withColumn("date", F.to_date(F.col("date")))
+                         .dropDuplicates(["external_code", "retail"])
+                )
+
+preprocessed_restock = (initial_restock.unionByName(preprocessed_restock))
 
 # COMMAND ----------
 
@@ -22,6 +35,7 @@ preprocessed_restock.createOrReplaceTempView("gold_restock_preview")
 
 # MAGIC %sql
 # MAGIC SELECT * FROM gold_restock_preview
+# MAGIC WHERE external_code = 1 AND retail = 3;
 
 # COMMAND ----------
 
@@ -35,8 +49,4 @@ preprocessed_restock.write.format("delta").mode("overwrite").option("overwriteSc
 # COMMAND ----------
 
 #%sql
-##DROP TABLE portfolio.end_to_end_demand_forecast.silver_restock_table
-
-# COMMAND ----------
-
-##dbutils.fs.rm("dbfs:/end_to_end_demand_forecast/checkpoint/silver/restock", True)
+##DROP TABLE portfolio.end_to_end_demand_forecast.gold_restock_table

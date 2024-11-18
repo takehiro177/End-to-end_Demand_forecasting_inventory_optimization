@@ -70,7 +70,6 @@ def batch_upsert(microBatchDF, batchId):
                     .withColumn("file_name", F.split(extract_category("path"), '/').getItem(1))
                     .withColumn("size", extract_size_udf(F.col("content")))
                     #.withColumn("embed", extract_img_embed_udf("content"))
-
                  )
 
     (microBatchDF.write.format("delta")
