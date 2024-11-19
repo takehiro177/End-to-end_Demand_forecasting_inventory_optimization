@@ -16,7 +16,7 @@ For blog post, see here: UNDER CONSTRUCTION
 ## Technology Stack:
 - Nixtla
 - LightGBM
-- Fastembed
+- imgbeddings
 - Evidently AI
 
 ## License
