@@ -11,6 +11,7 @@ For blog post, see here: UNDER CONSTRUCTION
 - structured streaming and processing for multi-modal data (image, time series, and table)
 - data pipeline and MLOps for training and evaluating AI/ML model
 - advanced modeling with multi-modal data for forecasting
+- uncertainty quantification using conformal prediction
 - dashboard for MLOps and inventory optimization
 
 ## Technology Stack:
@@ -18,6 +19,7 @@ For blog post, see here: UNDER CONSTRUCTION
 - LightGBM
 - imgbeddings
 - Evidently AI
+- MAPIE
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
