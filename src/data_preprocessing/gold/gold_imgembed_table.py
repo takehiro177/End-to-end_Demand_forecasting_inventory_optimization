@@ -11,7 +11,7 @@ dbutils.library.restartPython()
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 from pyspark.sql.functions import udf, pandas_udf, PandasUDFType
-from pyspark.sql.types import ArrayType, StringType, IntegerType, FloatType
+from pyspark.sql.types import ArrayType, StringType, IntegerType, FloatType, BooleanType
 
 import io
 import numpy as np
@@ -22,6 +22,15 @@ from PIL import Image, ImageOps
 from imgbeddings import imgbeddings
 
 # COMMAND ----------
+
+def is_valid_image(image_data):
+    try:
+        Image.open(io.BytesIO(image_data)).verify()
+        return True
+    except:
+        return False
+
+is_valid_image_udf = udf(is_valid_image, BooleanType())
 
 def extract_img_embed(content):
   """Extract image embedding from its raw content."""
@@ -45,11 +54,18 @@ preprocessed_clothes_table = (spark.read.table("portfolio.end_to_end_demand_fore
                                 F.col("category"),
                                 F.col("file_name"),
                                 )
+                        .filter(F.col("content").isNotNull())
+                        .filter((is_valid_image_udf(F.col("content"))))
                         .withColumn("img_path", F.concat(F.col("category"), F.lit("/"), F.col("file_name")))
                         .withColumn("embed", extract_img_embed_udf(F.col("content")))
+                        .drop("content")
                 )
         
 
+
+# COMMAND ----------
+
+preprocessed_clothes_table.show()
 
 # COMMAND ----------
 
