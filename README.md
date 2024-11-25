@@ -5,7 +5,7 @@ This repository is an example of end-to-end demand forecasting and inventory opt
 The datasource used in this work is real world and real data for fashion industry, called Visuelle 2.0.
 See more information: https://humaticslab.github.io/forecasting/visuelle
 
-For blog post, see here: UNDER CONSTRUCTION
+For blog post, see here: https://takehiroohashidsml.substack.com/p/end-to-end-demand-forecast-and-inventory?r=1vxpx7&utm_campaign=post&utm_medium=web&triedRedirect=true
 
 ## Demonstration includes:
 - structured streaming and processing for multi-modal data (image, time series, and table)
